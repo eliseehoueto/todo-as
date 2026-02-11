@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const dotenv = require('dotenv').config();
+const { swaggerUi, specs } = require('./config/swagger');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -30,15 +31,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const connectBD =require('./config/db');
+connectBD();
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch((err) => console.error('Erreur de connexion :', err));
-
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
   
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/todo', todosRouter);
+app.use('/v1/api', todosRouter);
 
 
 
