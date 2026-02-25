@@ -57,6 +57,7 @@ exports.deleteTodo = async (req, res) => {
   }
 };
 
+/*
 exports.completeTodo =  async (req, res) => {
   try {
     const updatedTodo = await Todo.findByIdAndUpdate(
@@ -68,6 +69,28 @@ exports.completeTodo =  async (req, res) => {
     if (!updatedTodo) {
         return res.status(404).json({ message: "Tâche introuvable" });
     }
+
+    res.json(updatedTodo);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};*/
+
+
+exports.completeTodo = async (req, res) => {
+  try {
+    // 1. On cherche d'abord la tâche pour connaître son état actuel
+    const todo = await Todo.findById(req.params.id);
+
+    if (!todo) {
+      return res.status(404).json({ message: "Tâche introuvable" });
+    }
+
+    // 2. On inverse la valeur de 'completed' (!todo.completed)
+    todo.completed = !todo.completed;
+    
+    // 3. On sauvegarde les modifications
+    const updatedTodo = await todo.save();
 
     res.json(updatedTodo);
   } catch (err) {
